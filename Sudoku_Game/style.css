@@ -1,0 +1,754 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #0288d1;
+    overflow: hidden;
+}
+
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    background: #0288d1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Header Section */
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    background: #0288d1;
+    position: relative;
+    z-index: 10;
+}
+
+.timer-circle {
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: #ff4444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#timer {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+.hearts-display {
+    font-size: 2.5em;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex: 1;
+}
+
+.heart {
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.heart.lost {
+    opacity: 0.15;
+}
+
+.exit-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.exit-btn:active {
+    transform: scale(0.95);
+}
+
+/* Board Section */
+.board-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px;
+    min-height: 0;
+}
+
+.sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 0;
+    border: 4px solid #333;
+    background: white;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    width: auto;
+    height: auto;
+    max-width: 90vh;
+    max-height: 90vh;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #999;
+    cursor: pointer;
+    font-size: 1.4em;
+    font-weight: bold;
+    background: white;
+    transition: all 0.2s ease;
+    user-select: none;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    min-width: 50px;
+    min-height: 50px;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.cell:hover {
+    background: #f0f0f0;
+}
+
+.cell.given {
+    background: #e8e8e8;
+    color: #000;
+    font-weight: bold;
+}
+
+.cell.selected {
+    background: #ffd700;
+    box-shadow: inset 0 0 0 2px #0288d1;
+    z-index: 5;
+}
+
+.cell.error {
+    background: #ffcccc;
+    color: #c0392b;
+}
+
+.cell.highlight {
+    background: #e8f4f8;
+}
+
+.cell.same-value {
+    background: #fff9e6;
+}
+
+.cell-notes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    font-size: 0.5em;
+    width: 100%;
+    height: 100%;
+    padding: 2px;
+}
+
+.note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0288d1;
+    font-weight: bold;
+    font-size: 0.6em;
+}
+
+/* Thick borders for 3x3 blocks */
+.cell:nth-child(3n):not(:nth-child(9n)) {
+    border-right: 3px solid #333;
+}
+
+.cell:nth-child(3n-1):not(:nth-child(9n-1)):not(:nth-child(9n)) {
+    border-right: 1px solid #999;
+}
+
+.cell:nth-child(n+19):nth-child(-n+27) {
+    border-bottom: 3px solid #333;
+}
+
+.cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 3px solid #333;
+}
+
+.cell:nth-child(n+10):nth-child(-n+18) {
+    border-bottom: 1px solid #999;
+}
+
+.cell:nth-child(n+28):nth-child(-n+36) {
+    border-bottom: 1px solid #999;
+}
+
+.cell:nth-child(n+37):nth-child(-n+45) {
+    border-bottom: 1px solid #999;
+}
+
+.cell:nth-child(n+55):nth-child(-n+63) {
+    border-bottom: 1px solid #999;
+}
+
+.cell:nth-child(n+64):nth-child(-n+72) {
+    border-bottom: 1px solid #999;
+}
+
+.cell:nth-child(n+73):nth-child(-n+81) {
+    border-bottom: 1px solid #999;
+}
+
+/* Controls Panel */
+.controls-panel {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px;
+    background: #0288d1;
+    gap: 10px;
+}
+
+.control-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 100px;
+    text-transform: uppercase;
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.control-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.control-btn.active {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn .icon {
+    font-size: 1.8em;
+}
+
+.control-btn .label {
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
+}
+
+/* Number Pad */
+.number-pad {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+    padding: 15px;
+    background: #0288d1;
+}
+
+.num-btn {
+    padding: 15px;
+    font-size: 1.3em;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+.num-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.num-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.num-btn.delete {
+    grid-column: span 9;
+    font-size: 1.1em;
+    background: rgba(255, 100, 100, 0.3);
+    border-color: rgba(255, 100, 100, 0.5);
+}
+
+.num-btn.delete:hover {
+    background: rgba(255, 100, 100, 0.4);
+}
+
+/* Message */
+#message {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: bold;
+    z-index: 100;
+    display: none;
+    max-width: 90%;
+    text-align: center;
+}
+
+#message.show {
+    display: block;
+}
+
+/* Difficulty Selector */
+.difficulty-selector {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+
+.difficulty-selector.show {
+    display: flex;
+}
+
+.difficulty-selector label {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.2em;
+}
+
+.difficulty-selector select {
+    padding: 12px;
+    border: 2px solid #0288d1;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    background: white;
+    color: #333;
+}
+
+#startGameBtn {
+    padding: 12px 30px;
+    background: #0288d1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#startGameBtn:hover {
+    background: #0277bd;
+    transform: translateY(-2px);
+}
+
+/* Desktop Responsive */
+@media (min-width: 1025px) {
+    .header {
+        padding: 25px 40px;
+        gap: 40px;
+    }
+
+    .timer-circle, .exit-btn {
+        width: 80px;
+        height: 80px;
+        font-size: 2.2em;
+        flex-shrink: 0;
+    }
+
+    .hearts-display {
+        font-size: 3em;
+        gap: 15px;
+    }
+
+    .board-section {
+        padding: 30px;
+    }
+
+    .sudoku-board {
+        max-width: 90vh;
+        max-height: 90vh;
+        border-width: 5px;
+    }
+
+    .cell {
+        width: calc(90vh / 9);
+        height: calc(90vh / 9);
+        font-size: 1.6em;
+        border-width: 1.5px;
+        min-width: auto;
+        min-height: auto;
+    }
+
+    .cell-notes {
+        padding: 3px;
+    }
+
+    .note {
+        font-size: 0.7em;
+    }
+
+    .controls-panel {
+        padding: 25px;
+        gap: 15px;
+    }
+
+    .control-btn {
+        padding: 15px 20px;
+        font-size: 0.9em;
+        max-width: 110px;
+    }
+
+    .control-btn .icon {
+        font-size: 2.2em;
+    }
+
+    .control-btn .label {
+        font-size: 0.8em;
+    }
+
+    .number-pad {
+        gap: 10px;
+        padding: 20px;
+        max-width: 90vh;
+    }
+
+    .num-btn {
+        padding: 18px;
+        font-size: 1.5em;
+        min-height: 50px;
+    }
+
+    .num-btn.delete {
+        font-size: 1.2em;
+    }
+
+    .difficulty-selector {
+        padding: 50px 40px;
+    }
+
+    .difficulty-selector label {
+        font-size: 1.4em;
+    }
+
+    .difficulty-selector select {
+        padding: 15px;
+        font-size: 1.2em;
+    }
+
+    #startGameBtn {
+        padding: 15px 40px;
+        font-size: 1.2em;
+    }
+}
+
+/* Tablet Responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .header {
+        padding: 20px 30px;
+        gap: 20px;
+    }
+
+    .timer-circle, .exit-btn {
+        width: 75px;
+        height: 75px;
+        font-size: 2em;
+        flex-shrink: 0;
+    }
+
+    .hearts-display {
+        font-size: 2.8em;
+        gap: 12px;
+    }
+
+    .board-section {
+        padding: 25px;
+    }
+
+    .sudoku-board {
+        max-width: 85vh;
+        max-height: 85vh;
+    }
+
+    .cell {
+        width: calc(85vh / 9);
+        height: calc(85vh / 9);
+        font-size: 1.5em;
+        border-width: 1.2px;
+        min-width: auto;
+        min-height: auto;
+    }
+
+    .controls-panel {
+        padding: 18px;
+        gap: 12px;
+    }
+
+    .control-btn {
+        padding: 12px 16px;
+        font-size: 0.85em;
+        max-width: 105px;
+    }
+
+    .control-btn .icon {
+        font-size: 2em;
+    }
+
+    .number-pad {
+        gap: 8px;
+        padding: 18px;
+    }
+
+    .num-btn {
+        padding: 15px;
+        font-size: 1.3em;
+        min-height: 48px;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 0;
+    }
+
+    .header {
+        padding: 10px 10px;
+        gap: 8px;
+    }
+
+    .timer-circle, .exit-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2em;
+        flex-shrink: 0;
+    }
+
+    .hearts-display {
+        font-size: 1.6em;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .board-section {
+        padding: 10px;
+        flex: 0 0 auto;
+        min-height: 0;
+        justify-content: flex-start;
+    }
+
+    .sudoku-board {
+        width: min(calc(100vw - 20px), 60vh);
+        height: min(calc(100vw - 20px), 60vh);
+        border-width: 3px;
+        max-width: 60vh;
+        max-height: 60vh;
+    }
+
+    .cell {
+        width: calc(min(calc(100vw - 20px), 60vh) / 9);
+        height: calc(min(calc(100vw - 20px), 60vh) / 9);
+        font-size: 1.1em;
+        border-width: 0.8px;
+        min-width: auto;
+        min-height: auto;
+    }
+
+    .controls-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        padding: 10px;
+        gap: 8px;
+        z-index: 95;
+        background: #0288d1;
+    }
+
+    .control-btn {
+        padding: 8px 6px;
+        font-size: 0.7em;
+        max-width: 80px;
+        flex: 1;
+    }
+
+    .control-btn .icon {
+        font-size: 1.4em;
+    }
+
+    .control-btn .label {
+        font-size: 0.6em;
+    }
+
+    .number-pad {
+        display: none;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 5px;
+        padding: 10px;
+        position: fixed;
+        bottom: 80px;
+        left: 0;
+        right: 0;
+        background: #0288d1;
+        z-index: 100;
+    }
+
+    .number-pad.active {
+        display: grid;
+    }
+
+    .num-btn {
+        padding: 10px;
+        font-size: 1em;
+        min-height: 40px;
+        touch-action: manipulation;
+    }
+
+    .num-btn.delete {
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 12px 12px;
+    }
+
+    .timer-circle, .exit-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.2em;
+    }
+
+    .hearts-display {
+        font-size: 1.8em;
+        gap: 4px;
+    }
+
+    .board-section {
+        padding: 10px;
+    }
+
+    .sudoku-board {
+        width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px);
+        border-width: 2px;
+    }
+
+    .cell {
+        width: calc((100vw - 20px) / 9);
+        height: calc((100vw - 20px) / 9);
+        font-size: 0.9em;
+        border-width: 0.6px;
+    }
+
+    .cell-notes {
+        padding: 1px;
+    }
+
+    .note {
+        font-size: 0.5em;
+    }
+
+    .controls-panel {
+        padding: 10px;
+        gap: 6px;
+    }
+
+    .control-btn {
+        padding: 8px 6px;
+        font-size: 0.7em;
+        max-width: 85px;
+    }
+
+    .control-btn .icon {
+        font-size: 1.4em;
+    }
+
+    .number-pad {
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .num-btn {
+        padding: 10px;
+        font-size: 1em;
+        min-height: 40px;
+    }
+
+    .difficulty-selector {
+        padding: 30px 20px;
+        max-width: 90vw;
+        width: 90vw;
+    }
+}
