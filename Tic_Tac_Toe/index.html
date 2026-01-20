@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe – Final Full Version</title>
+
+    <!-- Google AdSense (replace IDs when live) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+    <style>
+        :root {
+            --bg: #f4f4f4;
+            --card: #ffffff;
+            --text: #222;
+            --x: #ff2d55;
+            --o: #007aff;
+            --accent: #667eea;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ---------- ADS ---------- */
+        .banner {
+            width: 100%;
+            min-height: 60px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layout {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .side-ad {
+            width: 160px;
+            min-height: 300px;
+            background: #000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+        }
+
+        /* ---------- GAME CARD ---------- */
+        .container {
+            background: var(--card);
+            padding: 16px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+            text-align: center;
+        }
+
+        /* ---------- UI ---------- */
+        select,
+        button {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            margin: 4px;
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ---------- BOARD ---------- */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .cell {
+            aspect-ratio: 1/1;
+            border: none;
+            border-radius: 12px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cell span {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .cell span.x {
+            color: var(--x);
+        }
+
+        .cell span.o {
+            color: var(--o);
+        }
+
+        /* ---------- SCORE ---------- */
+        .score {
+            display: flex;
+            justify-content: space-around;
+            margin: 8px 0;
+        }
+
+        /* ---------- POPUP ---------- */
+        .popup {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4caf50;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: .4s;
+            z-index: 999;
+        }
+
+        .popup.show {
+            top: 20px
+        }
+
+        /* ---------- MODAL ---------- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 14px;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media(max-width:900px) {
+            .side-ad {
+                display: none
+            }
+        }
+
+        /* ACHIEVEMENT MODAL UI */
+        .ach-card {
+            background: #fff;
+            padding: 22px;
+            border-radius: 18px;
+            width: 90%;
+            max-width: 340px;
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(0.8);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .ach-card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .ach-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .ach-item .icon {
+            font-size: 22px;
+        }
+
+        .ach-item.unlocked {
+            background: #e8f7ee;
+            color: #2e7d32;
+        }
+
+        .ach-item.locked {
+            background: #f0f0f0;
+            color: #999;
+        }
+
+        .close-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: #eee;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP BANNER -->
+    <div class="banner">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="1111111111"
+            data-ad-format="auto"></ins>
+    </div>
+
+    <div class="layout">
+
+        <!-- LEFT AD -->
+        <div class="side-ad">VIDEO AD</div>
+
+        <!-- GAME -->
+        <div class="container">
+            <h2>🎮 Tic Tac Toe</h2>
+
+            <select id="level">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard 🔥</option>
+            </select>
+
+            <div class="score">
+                <div>You: <span id="pScore">0</span></div>
+                <div>CPU: <span id="cScore">0</span></div>
+            </div>
+
+            <div class="board" id="board"></div>
+
+            <p id="status"></p>
+
+            <button class="primary" onclick="resetGame()">Restart</button>
+            <button id="soundBtn" onclick="toggleSound()">🔊 Sound ON</button>
+            <button onclick="openAchievements()">🏆 Achievements</button>
+        </div>
+
+        <!-- RIGHT AD -->
+        <div class="side-ad">VIDEO AD</div>
+
+    </div>
+
+    <!-- BOTTOM BANNER -->
+    <div class="banner">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXX" data-ad-slot="2222222222"
+            data-ad-format="auto"></ins>
+    </div>
+
+    <!-- POPUP -->
+    <div class="popup" id="popup"></div>
+
+    <!-- ACHIEVEMENTS MODAL -->
+    <div class="modal" id="modal">
+        <div class="ach-card">
+            <h3>🏆 Achievements</h3>
+
+            <div class="ach-item unlocked">
+                <span class="icon">🥇</span>
+                <span>First Win</span>
+            </div>
+
+            <div class="ach-item unlocked">
+                <span class="icon">🥈</span>
+                <span>Pro Player</span>
+            </div>
+
+            <div class="ach-item unlocked">
+                <span class="icon">🥉</span>
+                <span>Master</span>
+            </div>
+
+            <div class="ach-item unlocked">
+                <span class="icon">🔥</span>
+                <span>Unbeatable</span>
+            </div>
+
+            <button class="close-btn" onclick="closeAchievements()">Close</button>
+        </div>
+    </div>
+
+
+    <!-- SOUNDS (LOCAL FILES) -->
+    <audio id="clickSound" src="sounds/click.mp3"></audio>
+    <audio id="winSound" src="sounds/win.mp3"></audio>
+    <audio id="loseSound" src="sounds/lose.mp3"></audio>
+
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+        /* ---------- STATE ---------- */
+        let board = Array(9).fill("");
+        let gameOver = false;
+        let soundOn = true;
+
+        let pScore = +localStorage.pScore || 0;
+        let cScore = +localStorage.cScore || 0;
+        let achievements = JSON.parse(localStorage.ach || "[]");
+
+        /* ---------- ELEMENTS ---------- */
+        const boardDiv = document.getElementById("board");
+        const statusEl = document.getElementById("status");
+        const level = document.getElementById("level");
+        const popup = document.getElementById("popup");
+        const modal = document.getElementById("modal");
+        const achList = document.getElementById("achList");
+        const pScoreEl = document.getElementById("pScore");
+        const cScoreEl = document.getElementById("cScore");
+
+        /* ---------- SOUND ---------- */
+        function play(id) {
+            if (!soundOn) return;
+
+            const s = document.getElementById(id);
+            if (!s) return;
+
+            s.pause();          // important
+            s.currentTime = 0;
+
+            s.play().catch(() => { }); // mobile-safe
+        }
+
+
+        /* ---------- INIT ---------- */
+        updateScore();
+        drawBoard();
+
+        /* ---------- BOARD ---------- */
+        function drawBoard() {
+            boardDiv.innerHTML = "";
+            board.forEach((v, i) => {
+                const b = document.createElement("button");
+                b.className = "cell";
+
+                const s = document.createElement("span");
+                if (v === "X") { s.textContent = "X"; s.className = "x"; }
+                if (v === "O") { s.textContent = "O"; s.className = "o"; }
+
+                b.appendChild(s);
+                b.onclick = () => playerMove(i);
+                boardDiv.appendChild(b);
+            });
+        }
+
+        /* ---------- GAME ---------- */
+        function playerMove(i) {
+            if (board[i] || gameOver) return;
+            board[i] = "X";
+            play("clickSound");
+            checkGame();
+            if (!gameOver) cpuMove();
+        }
+
+        function cpuMove() {
+            let move;
+            if (level.value === "hard") move = minimax(board, "O").index;
+            else move = randomMove();
+            board[move] = "O";
+            play("clickSound");
+            checkGame();
+            drawBoard();
+        }
+
+        function randomMove() {
+            const e = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+            return e[Math.floor(Math.random() * e.length)];
+        }
+
+        /* ---------- MINIMAX ---------- */
+        function minimax(b, p) {
+            const avail = b.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+            if (win(b, "X")) return { score: -10 };
+            if (win(b, "O")) return { score: 10 };
+            if (!avail.length) return { score: 0 };
+
+            const moves = [];
+            for (const i of avail) {
+                const m = { index: i };
+                b[i] = p;
+                m.score = minimax(b, p === "O" ? "X" : "O").score;
+                b[i] = "";
+                moves.push(m);
+            }
+            return p === "O"
+                ? moves.reduce((a, c) => a.score > c.score ? a : c)
+                : moves.reduce((a, c) => a.score < c.score ? a : c);
+        }
+
+        /* ---------- CHECK ---------- */
+        function checkGame() {
+            if (win(board, "X")) {
+                pScore++;
+                statusEl.textContent = "You Win 🎉";
+                play("winSound");
+
+                // 👇 YAHI PE ACHIEVEMENTS UNLOCK HONGE
+                if (pScore >= 500) {
+                    unlockAchievement("Unbeatable");
+                }
+                else if (pScore >= 350) {
+                    unlockAchievement("Master");
+                }
+                else if (pScore >= 200) {
+                    unlockAchievement("Pro Player");
+                }
+                else {
+                     unlockAchievement("First Win");
+                }
+
+                gameOver = true;
+            }
+            else if (win(board, "O")) {
+                cScore++;
+                statusEl.textContent = "CPU Wins 🤖";
+                play("loseSound");
+                gameOver = true;
+            }
+            else if (!board.includes("")) {
+                statusEl.textContent = "Draw 🤝";
+                gameOver = true;
+            }
+            save();
+            updateScore();
+            drawBoard();
+        }
+
+        function win(b, p) {
+            return [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+                .some(x => x.every(i => b[i] === p));
+        }
+
+        /* ---------- ACHIEVEMENTS ---------- */
+        function unlockAchievement(name) {
+            if (!achievements.includes(name)) {
+                achievements.push(name);
+                localStorage.ach = JSON.stringify(achievements);
+                showPopup("🏆 Achievement Unlocked!");
+            }
+        }
+
+        function showPopup(text) {
+            popup.textContent = text;
+            popup.classList.add("show");
+            setTimeout(() => popup.classList.remove("show"), 2000);
+        }
+
+        function openAchievements() {
+            modal.style.display = "flex";
+            achList.innerHTML = achievements.length
+                ? achievements.map(a => "✔ " + a).join("<br>")
+                : "No achievements yet";
+        }
+        function closeAchievements() {
+            modal.style.display = "none";
+        }
+
+        /* ---------- UTILS ---------- */
+        function updateScore() {
+            pScoreEl.textContent = pScore;
+            cScoreEl.textContent = cScore;
+        }
+        function save() {
+            localStorage.pScore = pScore;
+            localStorage.cScore = cScore;
+        }
+        function resetGame() {
+            board = Array(9).fill("");
+            gameOver = false;
+            statusEl.textContent = "";
+            drawBoard();
+        }
+        const soundBtn = document.getElementById("soundBtn");
+
+        function toggleSound() {
+            soundOn = !soundOn;
+
+            // Update button text
+            soundBtn.textContent = soundOn ? "🔊 Sound ON" : "🔇 Sound OFF";
+
+            // Immediately stop all sounds when OFF
+            if (!soundOn) {
+                ["clickSound", "winSound", "loseSound"].forEach(id => {
+                    const a = document.getElementById(id);
+                    if (a) {
+                        a.pause();
+                        a.currentTime = 0;
+                    }
+                });
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

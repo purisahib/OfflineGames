@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tic Tac Toe Pro</title>
+
+<!-- GOOGLE ADS SCRIPT -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<style>
+body{
+margin:0;font-family:Arial;background:#f4f4f4;
+display:flex;flex-direction:column;align-items:center;
+}
+.banner{
+width:100%;height:60px;background:#ddd;
+display:flex;justify-content:center;align-items:center;
+}
+.main{display:flex;}
+.videoAd{
+width:160px;height:300px;background:#000;color:#fff;
+display:flex;align-items:center;justify-content:center;margin:10px;
+}
+.container{
+background:#fff;padding:20px;border-radius:15px;
+width:320px;text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+}
+.board{
+display:grid;grid-template-columns:repeat(3,90px);
+gap:10px;margin:10px auto;
+}
+.cell{
+height:90px;font-size:36px;font-weight:bold;
+border:none;border-radius:12px;cursor:pointer;
+}
+.X{color:#ff416c;} .O{color:#1cb5e0;}
+
+.popup{
+position:fixed;top:-100px;left:50%;
+transform:translateX(-50%);
+background:#4CAF50;color:#fff;
+padding:15px 25px;border-radius:20px;
+font-weight:bold;
+transition:0.5s;
+z-index:999;
+}
+.popup.show{top:20px;}
+
+.score{display:flex;justify-content:space-around;}
+</style>
+</head>
+
+<body>
+
+<!-- TOP BANNER AD -->
+<div class="banner">
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+data-ad-slot="1111111111"
+data-ad-format="auto"></ins>
+</div>
+
+<div class="main">
+
+<!-- LEFT VIDEO AD -->
+<div class="videoAd">VIDEO AD</div>
+
+<div class="container">
+<h2>🎮 Tic Tac Toe</h2>
+
+<select id="level">
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+</select>
+
+<div class="score">
+<div>You <span id="pScore">0</span></div>
+<div>CPU <span id="cScore">0</span></div>
+</div>
+
+<div class="board" id="board"></div>
+<p id="status"></p>
+<button onclick="resetGame()">Restart</button>
+</div>
+
+<!-- RIGHT VIDEO AD -->
+<div class="videoAd">VIDEO AD</div>
+
+</div>
+
+<!-- BOTTOM BANNER AD -->
+<div class="banner">
+<ins class="adsbygoogle"
+style="display:block"
+data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+data-ad-slot="2222222222"
+data-ad-format="auto"></ins>
+</div>
+
+<!-- ACHIEVEMENT POPUP -->
+<div class="popup" id="popup"></div>
+
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+(adsbygoogle = window.adsbygoogle || []).push({});
+
+let board=Array(9).fill("");
+let gameOver=false;
+
+let pScore=+localStorage.pScore||0;
+let cScore=+localStorage.cScore||0;
+let achievements=JSON.parse(localStorage.ach||"[]");
+
+const boardDiv=document.getElementById("board");
+const status=document.getElementById("status");
+const popup=document.getElementById("popup");
+const pScoreEl=document.getElementById("pScore");
+const cScoreEl=document.getElementById("cScore");
+const level=document.getElementById("level");
+
+updateScore();
+createBoard();
+
+/* GAME */
+function createBoard(){
+boardDiv.innerHTML="";
+board.forEach((v,i)=>{
+let b=document.createElement("button");
+b.className="cell "+v;
+b.innerText=v;
+b.onclick=()=>move(i);
+boardDiv.appendChild(b);
+});
+}
+
+function move(i){
+if(board[i]||gameOver)return;
+board[i]="X";
+check();
+if(!gameOver)cpu();
+}
+
+function cpu(){
+let empty=board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+let m=empty[Math.floor(Math.random()*empty.length)];
+board[m]="O";
+check();
+createBoard();
+}
+
+function check(){
+if(win("X")){
+pScore++;status.innerText="You Win 🎉";
+achievementCheck();
+gameOver=true;
+}
+else if(win("O")){
+cScore++;status.innerText="CPU Wins 🤖";
+gameOver=true;
+}
+else if(!board.includes("")){
+status.innerText="Draw 🤝";
+gameOver=true;
+}
+save();
+updateScore();
+createBoard();
+}
+
+function win(p){
+return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+.some(x=>x.every(i=>board[i]===p));
+}
+
+/* ACHIEVEMENTS */
+function achievementCheck(){
+unlock("🥇 First Win",pScore>=1);
+unlock("🥈 Pro Player",pScore>=5);
+unlock("🥉 Master",pScore>=10);
+}
+
+function unlock(name,cond){
+if(cond && !achievements.includes(name)){
+achievements.push(name);
+localStorage.ach=JSON.stringify(achievements);
+showPopup("Achievement Unlocked! "+name);
+}
+}
+
+function showPopup(text){
+popup.innerText=text;
+popup.classList.add("show");
+setTimeout(()=>popup.classList.remove("show"),2000);
+}
+
+function updateScore(){
+pScoreEl.innerText=pScore;
+cScoreEl.innerText=cScore;
+}
+
+function save(){
+localStorage.pScore=pScore;
+localStorage.cScore=cScore;
+}
+
+function resetGame(){
+board=Array(9).fill("");
+gameOver=false;
+status.innerText="";
+createBoard();
+}
+</script>
+
+</body>
+</html>

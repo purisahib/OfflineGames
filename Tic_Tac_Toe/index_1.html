@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tic Tac Toe Ultimate AI</title>
+
+<style>
+:root{
+--bg:#f4f4f4;--card:#fff;--text:#111;--accent:#667eea;
+}
+.dark{
+--bg:#121212;--card:#1e1e1e;--text:#fff;--accent:#ff416c;
+}
+body{
+margin:0;height:100vh;background:var(--bg);
+display:flex;justify-content:center;align-items:center;
+font-family:Arial;transition:.3s;
+}
+.container{
+background:var(--card);color:var(--text);
+padding:20px;border-radius:20px;width:340px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+text-align:center;
+}
+.top{display:flex;justify-content:space-between;}
+.board{
+display:grid;grid-template-columns:repeat(3,90px);
+gap:10px;margin:15px 0;justify-content:center;
+}
+.cell{
+height:90px;font-size:36px;font-weight:bold;
+border:none;border-radius:15px;cursor:pointer;
+}
+.X{color:#ff416c;} .O{color:#1cb5e0;}
+.score{display:flex;justify-content:space-around;margin:10px 0;}
+button,select{padding:8px;border-radius:10px;border:none;}
+.restart{background:var(--accent);color:#fff;}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h2>🧠 Tic Tac Toe AI</h2>
+
+<div class="top">
+<select id="level">
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard 🔥</option>
+</select>
+<button onclick="toggleMode()">🌙</button>
+</div>
+
+<div class="score">
+<div>You: <span id="pScore">0</span></div>
+<div>CPU: <span id="cScore">0</span></div>
+<div>Draw: <span id="dScore">0</span></div>
+</div>
+
+<div class="board" id="board"></div>
+<button class="restart" onclick="resetGame()">Restart</button>
+<p id="status"></p>
+</div>
+
+<script>
+let board = Array(9).fill("");
+let gameOver=false;
+
+let pScore=localStorage.pScore?+localStorage.pScore:0;
+let cScore=localStorage.cScore?+localStorage.cScore:0;
+let dScore=localStorage.dScore?+localStorage.dScore:0;
+
+const boardDiv=document.getElementById("board");
+const statusText=document.getElementById("status");
+const pScoreEl=document.getElementById("pScore");
+const cScoreEl=document.getElementById("cScore");
+const dScoreEl=document.getElementById("dScore");
+
+updateScore();
+
+function createBoard(){
+boardDiv.innerHTML="";
+board.forEach((v,i)=>{
+let b=document.createElement("button");
+b.className="cell "+v;
+b.innerText=v;
+b.onclick=()=>move(i);
+boardDiv.appendChild(b);
+});
+}
+
+function move(i){
+if(board[i]||gameOver)return;
+board[i]="X";
+check();
+if(!gameOver)cpuMove();
+}
+
+function cpuMove(){
+let lvl=level.value;
+let m;
+if(lvl==="easy")m=randomMove();
+else if(lvl==="medium")m=smartMove();
+else m=minimax(board,"O").index;
+board[m]="O";
+check();
+createBoard();
+}
+
+function randomMove(){
+let e=board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+return e[Math.floor(Math.random()*e.length)];
+}
+
+function smartMove(){
+return minimax(board,"O").index;
+}
+
+/* 🧠 MINIMAX AI */
+function minimax(newBoard,player){
+let avail=newBoard.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+
+if(checkWin(newBoard,"X")) return {score:-10};
+if(checkWin(newBoard,"O")) return {score:10};
+if(avail.length===0) return {score:0};
+
+let moves=[];
+for(let i of avail){
+let move={index:i};
+newBoard[i]=player;
+let result=minimax(newBoard,player==="O"?"X":"O");
+move.score=result.score;
+newBoard[i]="";
+moves.push(move);
+}
+
+let bestMove;
+if(player==="O"){
+let bestScore=-1000;
+moves.forEach(m=>{
+if(m.score>bestScore){bestScore=m.score;bestMove=m;}
+});
+}else{
+let bestScore=1000;
+moves.forEach(m=>{
+if(m.score<bestScore){bestScore=m.score;bestMove=m;}
+});
+}
+return bestMove;
+}
+
+function checkWin(b,p){
+const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+return w.some(x=>x.every(i=>b[i]===p));
+}
+
+function check(){
+if(checkWin(board,"X")){
+pScore++;statusText.innerText="You Win 🎉";gameOver=true;
+}
+else if(checkWin(board,"O")){
+cScore++;statusText.innerText="CPU Wins 🤖";gameOver=true;
+}
+else if(!board.includes("")){
+dScore++;statusText.innerText="Draw 🤝";gameOver=true;
+}
+saveScore();
+updateScore();
+createBoard();
+}
+
+function saveScore(){
+localStorage.pScore=pScore;
+localStorage.cScore=cScore;
+localStorage.dScore=dScore;
+}
+
+function updateScore(){
+pScoreEl.textContent=pScore;
+cScoreEl.textContent=cScore;
+dScoreEl.textContent=dScore;
+}
+
+function resetGame(){
+board=Array(9).fill("");
+gameOver=false;
+statusText.innerText="";
+createBoard();
+}
+
+function toggleMode(){
+document.body.classList.toggle("dark");
+}
+
+createBoard();
+</script>
+</body>
+</html>

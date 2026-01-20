@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Block Puzzle Game</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<div id="levelSelectModal" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:1000;">
+  <h1 style="color:var(--text); margin-bottom:40px; font-size:40px;">SELECT LEVEL</h1>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+    <button class="levelBtn" data-level="0" onclick="selectLevel(0)" style="padding:20px 30px; font-size:20px; background:#4dd0ff; border:none; border-radius:8px; cursor:pointer; color:#2f4275; font-weight:bold;">
+      🟢 EASY<br><span style="font-size:12px;">(10x10)</span>
+    </button>
+    <button class="levelBtn" data-level="1" onclick="selectLevel(1)" style="padding:20px 30px; font-size:20px; background:#b45cff; border:none; border-radius:8px; cursor:pointer; color:#fff; font-weight:bold;">
+      🟡 SIMPLE<br><span style="font-size:12px;">(10x10)</span>
+    </button>
+    <button class="levelBtn" data-level="2" onclick="selectLevel(2)" style="padding:20px 30px; font-size:20px; background:#ff6b6b; border:none; border-radius:8px; cursor:pointer; color:#fff; font-weight:bold;">
+      🔴 HARD<br><span style="font-size:12px;">(12x12)</span>
+    </button>
+    <button class="levelBtn" data-level="3" onclick="selectLevel(3)" style="padding:20px 30px; font-size:20px; background:#8b0000; border:none; border-radius:8px; cursor:pointer; color:#fff; font-weight:bold;">
+      ⚫ VERY HARD<br><span style="font-size:12px;">(15x15)</span>
+    </button>
+  </div>
+  <p id="levelInfo" style="color:var(--text); margin-top:30px; font-size:16px;"></p>
+</div>
+
+<div id="loginBox"></div>
+
+<div class="game">
+  <div class="top">
+    <div>🏆 <span id="high">0</span></div>
+    <div>
+      <div>Score: <span id="score">0</span></div>
+      <div>Level: <span id="level">1</span></div>
+    </div>
+    <div> <button id="themeBtn">⚙️</button> </div>
+    <div> <button id="restartBtn">🔄</button> </div>
+  </div>
+
+  <canvas id="board" width="360" height="360"></canvas>
+  <canvas id="tray" width="360" height="120"></canvas>
+</div>
+
+<div id="gameOverModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:999;">
+  <div style="background:#2f4275; padding:40px; border-radius:20px; text-align:center; color:#fff;">
+    <h2 style="font-size:40px; margin:0 0 20px 0;">GAME OVER</h2>
+    <p style="font-size:24px; margin:10px 0;">Final Score: <span id="finalScore">0</span></p>
+    <p style="font-size:20px; margin:10px 0;">High Score: <span id="finalHigh">0</span></p>
+    <button onclick="restartGameFromModal()" style="margin-top:30px; padding:12px 30px; font-size:18px; background:#4dd0ff; border:none; border-radius:8px; cursor:pointer;">Play Again</button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/input.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/powerups.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
